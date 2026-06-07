@@ -1,619 +1,389 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HGZY VIP AI - 30s Color Trader | Savar Market</title>
-    
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>NAZMUl VIP</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <style>
-        * {
-            user-select: none;
-        }
-        :root {
-            --orange-gradient: linear-gradient(180deg, #ff9364 0%, #ff4d2c 100%);
-            --paper-white: #ffffff;
-            --text-dark: #1e272e;
-            --btn-green: #2ecc71;
-            --btn-red: #e74c3c;
-            --btn-violet: #9b59b6;
-        }
-
-        body { 
-            margin: 0; 
-            background: #0a0c12; 
-            overflow: hidden; 
-            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif; 
-        }
-
-        /* Live Market Iframe - Savar 30s Color Trading Connection */
-        iframe { 
-            width: 100vw; 
-            height: 100vh; 
-            border: none; 
-            pointer-events: auto;
-        }
-
-        /* Compact Draggable Panel - SMALLER SIZE (240px) */
-        #draggablePanel {
-            width: 240px;
-            position: fixed;
-            z-index: 99999;
-            cursor: move;
-            touch-action: none;
-            display: none;
-            filter: drop-shadow(0 12px 28px rgba(0,0,0,0.6));
-            transition: transform 0.05s linear;
-        }
-
-        .congrats-card {
-            background: var(--orange-gradient);
-            border-radius: 24px;
-            padding: 12px 10px;
-            box-shadow: 0 18px 32px rgba(0, 0, 0, 0.5);
-            position: relative;
-            text-align: center;
-            border: 1.5px solid rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(1px);
-        }
-
-        /* Rocket Badge - Smaller */
-        .badge-container {
+        html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
+        
+        /* Full view container to clearly see the betting area at the bottom of the game screen */
+        .iframe-container {
             position: absolute;
-            top: -36px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 12;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow-y: auto; /* Allow scrolling to the bottom to see the betting room */
+            -webkit-overflow-scrolling: touch;
         }
-        .badge-circle {
-            width: 48px; height: 48px;
-            background: linear-gradient(145deg, #ffe6b3 0%, #ffaa33 100%);
-            border-radius: 50%;
-            border: 2.5px solid #fff;
+        
+        /* Upgraded iframe logic to make text and bottom options crystal clear */
+        iframe { 
+            width: 100%; 
+            height: 100%; /* Perfect height along the screen so the bottom bet panel isn't blocked */
+            border: none; 
+            display: block;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+        
+        /* Ultra-premium RGB neon animation for the entire panel */
+        @keyframes ultraRgbGlow {
+            0% { border-color: #00ffcc; box-shadow: 0 0 12px #00ffcc, inset 0 0 6px rgba(0, 255, 204, 0.3); }
+            33% { border-color: #ff007f; box-shadow: 0 0 12px #ff007f, inset 0 0 6px rgba(255, 0, 127, 0.3); }
+            66% { border-color: #ffd700; box-shadow: 0 0 12px #ffd700, inset 0 0 6px rgba(255, 215, 0, 0.3); }
+            100% { border-color: #00ffcc; box-shadow: 0 0 12px #00ffcc, inset 0 0 6px rgba(0, 255, 204, 0.3); }
+        }
+
+        /* Panel overlay design - compact size */
+        .box { 
+            width: 155px; 
+            height: auto;
+            background: linear-gradient(135deg, rgba(10, 5, 20, 0.98), rgba(4, 2, 8, 0.99));
+            border: 2px solid #00ffcc; 
+            border-radius: 16px; 
+            color: #fff; text-align: center; padding: 10px 8px; 
+            position: fixed; top: 120px; right: 10px;
+            z-index: 9999; cursor: grab; backdrop-filter: blur(25px); 
+            box-sizing: border-box;
+            animation: ultraRgbGlow 5s infinite linear;
+            touch-action: none; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .box:active { cursor: grabbing; }
+
+        /* Premium header style */
+        .panel-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            width: 100%;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            padding-bottom: 5px;
+        }
+
+        /* Ultra-modern logo animation */
+        .premium-logo-area {
+            position: relative;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 6px 14px rgba(0,0,0,0.3);
-        }
-        .badge-circle::after { content: '🎯'; font-size: 26px; }
-
-        .congrats-title {
-            color: #ffffff; 
-            font-size: 18px; 
-            font-weight: 800;
-            margin-top: 12px; 
-            margin-bottom: 6px;
-            letter-spacing: -0.2px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
 
-        /* Results row - Compact */
-        .lottery-results-row {
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            gap: 5px; 
-            color: #ffffff; 
-            font-size: 10px; 
-            margin-bottom: 10px;
-            background: rgba(0,0,0,0.2);
-            padding: 3px 10px;
-            border-radius: 50px;
-            width: fit-content;
-            margin-left: auto;
-            margin-right: auto;
+        .logo-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 1.5px dashed #00ffcc;
+            border-radius: 50%;
+            animation: spinRing 4s infinite linear;
         }
-        .res-badge {
-            padding: 2px 8px; 
-            border-radius: 30px; 
-            font-weight: 800; 
-            font-size: 10px;
-            background: #2c3e50;
+
+        @keyframes spinRing {
+            100% { transform: rotate(360deg); }
         }
-        .badge-num-display { 
-            background: #1e2a36; 
-            color: #fff; 
-            border-radius: 50%; 
-            width: 22px; 
-            height: 22px; 
-            display: inline-flex;
+
+        /* VIP server badge */
+        .server-badge {
+            display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 900;
-            font-size: 12px;
-        }
-
-        /* Ticket slot */
-        .ticket-slot {
-            background: #aa2e10; 
-            height: 6px; 
-            border-radius: 15px;
-            width: 92%; 
-            margin: 6px auto 0 auto; 
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
-        }
-        .paper-token {
-            background: var(--paper-white);
-            width: 88%; 
-            margin: -5px auto 4px auto;
-            padding: 8px 6px; 
-            border-radius: 0 0 18px 18px;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-            color: var(--text-dark); 
-            position: relative;
-        }
-
-        .scan-label { 
-            color: #e67e22; 
-            font-size: 8px; 
-            font-weight: 900; 
-            letter-spacing: 0.8px; 
-            text-transform: uppercase;
-        }
-        #prediction-main-text { 
-            font-size: 28px; 
-            font-weight: 900; 
-            color: #ff4d2c; 
-            margin: 0px 0;
-            line-height: 1.1;
-        }
-        .period-info-text { 
-            font-size: 9px; 
-            color: #5d6e7e; 
-            font-weight: 600;
-        }
-        /* AB Period Number Style - Compact */
-        .ab-period-number {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
-            color: #fff;
-            font-weight: 800;
-            padding: 3px 8px;
-            border-radius: 16px;
+            gap: 3px;
+            background: rgba(255, 215, 0, 0.07);
+            border: 1px solid #ffd700;
+            border-radius: 4px;
+            padding: 1px 4px;
             font-size: 8px;
-            display: inline-block;
-            margin-top: 5px;
-            letter-spacing: 0.3px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            font-weight: 900;
+            color: #ffd700;
+            text-transform: uppercase;
+            width: 100%;
+            box-sizing: border-box;
+            letter-spacing: 0.5px;
         }
-
-        /* Password Overlay - Compact */
-        #auth-overlay {
-            position: absolute; 
-            inset: 0;
-            background: var(--orange-gradient);
-            z-index: 1000;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center;
-            border-radius: 24px;
-            padding: 14px;
-            transition: opacity 0.25s ease;
-        }
-        .auth-rocket { font-size: 38px; margin-bottom: 5px; }
-        .login-title { color: #fff; font-size: 15px; font-weight: 800; margin-bottom: 12px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); letter-spacing: 0.8px; }
         
-        #passInput {
-            background: rgba(255,255,255,0.96); 
-            border: none; 
-            padding: 8px 14px;
-            color: #111; 
-            border-radius: 40px; 
-            text-align: center; 
-            width: 80%;
-            font-size: 13px; 
-            font-weight: 600;
-            outline: none; 
-            margin-bottom: 14px;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1), 0 4px 10px rgba(0,0,0,0.1);
+        .vpn-dot {
+            width: 5px;
+            height: 5px;
+            background-color: #39ff14;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 5px #39ff14;
         }
-        #loginBtn {
-            background: #fff; 
-            border: none; 
-            padding: 7px 22px;
-            border-radius: 40px; 
-            font-weight: 900; 
-            color: #ff4d2c; 
-            cursor: pointer;
-            text-transform: uppercase; 
-            font-size: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            transition: 0.1s;
-        }
-        #loginBtn:active { transform: scale(0.97); }
 
-        #offline-overlay {
-            position: fixed; 
-            top: 15px; 
-            left: 50%; 
-            transform: translateX(-50%);
-            background: #e74c3c; 
-            color: white; 
-            padding: 5px 16px;
-            border-radius: 30px; 
-            z-index: 100000; 
-            font-size: 11px; 
-            font-weight: bold;
-            display: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            backdrop-filter: blur(6px);
+        /* Login design */
+        #loginPart { 
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 100%; 
         }
-        .drag-hint {
-            font-size: 7px;
-            color: rgba(255,255,255,0.6);
-            margin-top: 5px;
+        #loginPart input { 
+            width: 100%; padding: 5px; background: #05050a; border: 1.2px solid #ff007f; 
+            border-radius: 6px; color: #fff; font-size: 11px; text-align: center; 
+            outline: none; box-sizing: border-box;
         }
-        .status-footer {
-            color: #fff; 
-            font-size: 7px; 
-            margin-top: 6px; 
-            opacity: 0.8; 
+        .login-btn { 
+            width: 100%; padding: 6px; background: linear-gradient(45deg, #00ffcc, #ff007f); color: #fff; 
+            border: none; border-radius: 6px; font-weight: 900; cursor: pointer; 
+            font-size: 10px; text-transform: uppercase; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        /* Inner part of the signal panel */
+        #appPart { 
             display: flex; 
-            justify-content: center; 
-            gap: 6px;
+            flex-direction: column;
+            align-items: center; 
+            gap: 5px;
+            width: 100%; 
         }
+        
+        .period-top-box {
+            background: rgba(255, 255, 255, 0.02); 
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px; 
+            padding: 3px; 
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .period-label { font-size: 8px; color: #bbb; text-transform: uppercase; display: block; font-weight: 600; letter-spacing: 0.3px; }
+        
+        #periodID { 
+            font-size: 12px; 
+            font-weight: 950; 
+            display: block; 
+            margin-top: 1px; 
+            word-break: break-all;
+        }
+        
+        /* Neon period text */
+        .p-cyan { color: #00ffcc; text-shadow: 0 0 4px #00ffcc; }
+        .p-pink { color: #ff007f; text-shadow: 0 0 4px #ff007f; }
+        .p-gold { color: #ffd700; text-shadow: 0 0 4px #ffd700; }
+        .p-green { color: #39ff14; text-shadow: 0 0 4px #39ff14; }
+
+        /* Timer */
+        .timer-container { text-align: center; width: 100%; }
+        .timer-txt { font-size: 14px; color: #ffff00; font-weight: 900; text-shadow: 0 0 5px #ffff00; }
+        
+        /* Signal display */
+        #signalContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            width: 100%;
+            padding-bottom: 2px;
+        }
+
+        .signal-txt { 
+            font-size: 26px; 
+            font-weight: 950; 
+            text-transform: uppercase; 
+            line-height: 1.1; 
+        }
+
+        .res-big { color: #00ffcc; text-shadow: 0 0 12px #00ffcc; }
+        .res-small { color: #ff007f; text-shadow: 0 0 12px #ff007f; }
+        .processing { font-size: 11px; color: #ffea00; animation: blink 0.4s infinite; text-shadow: 0 0 4px #ffea00; display: block; font-weight: 900; }
+        
+        @keyframes blink { 50% { opacity: 0.3; } }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<div id="offline-overlay">⚠️ NO INTERNET | SAVAR MARKET OFFLINE</div>
+    <!-- Iframe screen container (logic to show bottom betting part completely) -->
+    <div class="iframe-container">
+        <iframe src="https://hgnice.cc/#/register?invitationCode=511711502736"></iframe>
+    </div>
 
-<!-- LIVE MARKET IFRAME - Savar 30s Color Trading Platform (Connected) -->
-<iframe src="https://hgnice.cc/#/register?invitationCode=511711502736" title="Savar 30s Color Trading Market | Live Feed"></iframe>
-
-<div id="draggablePanel">
-    <div class="congrats-card">
+    <!-- Main upgraded mini panel box -->
+    <div class="box" id="dragBox">
         
-        <!-- Authentication Overlay -->
-        <div id="auth-overlay">
-            <div class="auth-rocket">🔐</div>
-            <div class="login-title">HGZY VIP ACCESS</div>
-            <input type="password" id="passInput" placeholder="ENTER PIN" autocomplete="off">
-            <button id="loginBtn" onclick="validateAccessKey()">UNLOCK</button>
-            <div class="drag-hint">✧ DRAG ✧</div>
+        <!-- Top header area -->
+        <div class="panel-header">
+            <!-- Hi-tech animated circle logo -->
+            <div class="premium-logo-area">
+                <div class="logo-ring"></div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#00ffcc"/>
+                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="#ff007f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <!-- Server badge -->
+            <div class="server-badge">
+                <span>VIP</span>
+                <div class="vpn-dot"></div>
+            </div>
         </div>
 
-        <div class="badge-container">
-            <div class="badge-circle"></div>
+        <!-- Login part -->
+        <div id="loginPart">
+            <input type="password" id="passInput" placeholder="Password">
+            <button class="login-btn" onclick="checkPass()">Login</button>
         </div>
 
-        <div class="congrats-title">LIVE SIGNAL</div>
-
-        <div class="lottery-results-row">
-            <span>📡</span>
-            <span id="badge-color" class="res-badge" style="background:#2ecc71">Green</span>
-            <span id="badge-num" class="badge-num-display">7</span>
-            <span id="badge-size" class="res-badge" style="background:#ff7675">Big</span>
-        </div>
-
-        <div class="ticket-slot"></div>
-
-        <div class="paper-token">
-            <div id="scan-label" class="scan-label">⚡ AI ENGINE</div>
-            <div id="prediction-main-text">---</div>
-            <div class="period-info-text">⏱️ WinGo 30s | <span id="timer-display" style="color:#ff4d2c; font-weight:800">30</span>s left</div>
-            <div id="period-display" class="period-info-text" style="font-size: 8px; margin-top: 2px;">Period: ---</div>
-            <!-- AB Period Number Display -->
-            <div id="ab-period-number" class="ab-period-number">AB-00000000000</div>
-        </div>
-
-        <div class="status-footer">
-            <span>● Savar Feed</span>
-            <span>|</span>
-            <span>30s Sync</span>
+        <!-- Hack signal panel -->
+        <div id="appPart" class="hidden">
+            <div class="period-top-box">
+                <span class="period-label">Live Period</span>
+                <span id="periodID">....</span>
+            </div>
+            
+            <div class="timer-container">
+                <div class="timer-txt"><span id="timer">--</span>s</div>
+            </div>
+            
+            <div id="signalContainer">
+                <div class="signal-txt" id="prediction">WAIT</div>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    // ============================================================
-    // HGZY VIP AI - COMPACT 30 SECOND COLOR TRADING MARKET
-    // SAVAR CONNECTION | FULL ENGLISH CODE | SMALLER PANEL
-    // ============================================================
-    let isLoggedIn = false;
-    const ACCESS_SECRET = "VIP100";
-    const CYCLE_SECONDS = 30;
-    let lastPeriodHash = "";
-    let marketIntervalId = null;
-    
-    // DOM Elements
-    const panelElement = document.getElementById("draggablePanel");
-    const authLayerDiv = document.getElementById("auth-overlay");
-    const timerSpan = document.getElementById("timer-display");
-    const periodSpan = document.getElementById("period-display");
-    const abPeriodSpan = document.getElementById("ab-period-number");
-    const predictionMainText = document.getElementById("prediction-main-text");
-    const scanLabelSpan = document.getElementById("scan-label");
-    const badgeColorSpan = document.getElementById("badge-color");
-    const badgeNumberSpan = document.getElementById("badge-num");
-    const badgeSizeSpan = document.getElementById("badge-size");
-    
-    // ---------- NETWORK & SAVAR CONNECTION ----------
-    function checkConnectionWithSavar() {
-        if (navigator.onLine) {
-            panelElement.style.display = "block";
-            document.getElementById("offline-overlay").style.display = "none";
-            if (isLoggedIn && !marketIntervalId) {
-                startSavarMarketEngine();
-            }
-        } else {
-            panelElement.style.display = "none";
-            document.getElementById("offline-overlay").style.display = "block";
-            if (marketIntervalId) {
-                clearInterval(marketIntervalId);
-                marketIntervalId = null;
-            }
-        }
-    }
-    
-    window.addEventListener('online', checkConnectionWithSavar);
-    window.addEventListener('offline', checkConnectionWithSavar);
-    
-    // ---------- AUTHENTICATION ----------
-    window.validateAccessKey = function() {
-        const enteredPin = document.getElementById("passInput").value.trim();
-        if (enteredPin === ACCESS_SECRET) {
-            authLayerDiv.style.opacity = "0";
-            setTimeout(() => {
-                authLayerDiv.style.display = "none";
-                isLoggedIn = true;
-                if (navigator.onLine) {
-                    startSavarMarketEngine();
-                    forceUpdateSignal();
-                }
-            }, 250);
-        } else {
-            alert("❌ ACCESS DENIED! Invalid PIN.");
-            document.getElementById("passInput").value = "";
-            document.getElementById("passInput").focus();
-        }
-    };
-    
-    // ---------- SAVAR 30S COLOR TRADING MARKET DATA ----------
-    function getSavarMarketOutcome() {
-        const isBigOutcome = Math.random() > 0.48;
-        let drawnNumber;
-        if (isBigOutcome) {
-            const bigNumbers = [5, 6, 7, 8, 9];
-            drawnNumber = bigNumbers[Math.floor(Math.random() * bigNumbers.length)];
-        } else {
-            const smallNumbers = [0, 1, 2, 3, 4];
-            drawnNumber = smallNumbers[Math.floor(Math.random() * smallNumbers.length)];
-        }
-        
-        let colorLabel = "";
-        let colorHexCode = "";
-        if (drawnNumber === 0 || drawnNumber === 5) {
-            colorLabel = "Violet";
-            colorHexCode = "#9b59b6";
-        } else {
-            if (drawnNumber % 2 === 0) {
-                colorLabel = "Red";
-                colorHexCode = "#e74c3c";
-            } else {
-                colorLabel = "Green";
-                colorHexCode = "#2ecc71";
-            }
-        }
-        
-        const sizeLabel = isBigOutcome ? "Big" : "Small";
-        const sizeBackground = isBigOutcome ? "#ff7675" : "#74b9ff";
-        
-        return {
-            number: drawnNumber,
-            colorName: colorLabel,
-            colorHex: colorHexCode,
-            size: sizeLabel,
-            sizeBg: sizeBackground,
-            isBig: isBigOutcome
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA4MXyCyvpAL8NQ23j3TWxiszPofWInVA",
+            authDomain: "wingo-ai-624fb.firebaseapp.com",
+            databaseURL: "https://wingo-ai-624fb-default-rtdb.firebaseio.com",
+            projectId: "wingo-ai-624fb",
+            appId: "1:266167882150:web:7f0f83606dfd4bcd8aff67"
         };
-    }
-    
-    // Update UI with fresh signal
-    function renderSavarSignal(marketData) {
-        predictionMainText.textContent = marketData.size;
-        predictionMainText.style.color = marketData.colorHex;
-        predictionMainText.style.opacity = "1";
+        firebase.initializeApp(firebaseConfig);
         
-        badgeColorSpan.textContent = marketData.colorName;
-        badgeColorSpan.style.background = marketData.colorHex;
-        badgeNumberSpan.textContent = marketData.number;
-        badgeSizeSpan.textContent = marketData.size;
-        badgeSizeSpan.style.background = marketData.sizeBg;
-        
-        scanLabelSpan.textContent = "🔥 ACTIVE";
-        scanLabelSpan.style.color = "#27ae60";
-        setTimeout(() => {
-            if (isLoggedIn && navigator.onLine) {
-                scanLabelSpan.textContent = "⚡ AI ENGINE";
-                scanLabelSpan.style.color = "#e67e22";
-            }
-        }, 1200);
-    }
-    
-    // Generate FULL Period ID + AB Number
-    function getFullPeriodWithAB() {
-        const now = new Date();
-        const totalSecondsToday = (now.getHours() * 3600) + (now.getMinutes() * 60) + now.getSeconds();
-        const periodIndex = Math.floor(totalSecondsToday / CYCLE_SECONDS) + 1;
-        const dateString = now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0');
-        const rawPeriod = dateString + "1000" + String(periodIndex).padStart(5, '0');
-        return `AB-${rawPeriod}`;
-    }
-    
-    function getCurrentPeriodRaw() {
-        const now = new Date();
-        const totalSecs = (now.getHours() * 3600) + (now.getMinutes() * 60) + now.getSeconds();
-        const idx = Math.floor(totalSecs / CYCLE_SECONDS) + 1;
-        const dateStr = now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0');
-        return dateStr + "1000" + String(idx).padStart(5, '0');
-    }
-    
-    // Core engine - 30 second cycle sync
-    function updateSavarCycle() {
-        if (!isLoggedIn || !navigator.onLine) return;
-        
-        const currentDate = new Date();
-        const currentSec = currentDate.getSeconds();
-        let remainingSeconds = CYCLE_SECONDS - (currentSec % CYCLE_SECONDS);
-        if (remainingSeconds === 0) remainingSeconds = CYCLE_SECONDS;
-        
-        const rawPeriod = getCurrentPeriodRaw();
-        const fullPeriodWithAB = getFullPeriodWithAB();
-        
-        timerSpan.textContent = remainingSeconds;
-        periodSpan.textContent = `Period: ${rawPeriod}`;
-        abPeriodSpan.textContent = fullPeriodWithAB;
-        
-        // Analyzing state during last 5 seconds
-        if (remainingSeconds <= 5 && remainingSeconds > 0) {
-            scanLabelSpan.textContent = "📡 FETCHING...";
-            predictionMainText.style.opacity = "0.6";
-            if (remainingSeconds === 3) predictionMainText.textContent = "SCAN";
-            if (remainingSeconds === 1) predictionMainText.textContent = "LOCK";
-        } else {
-            if (scanLabelSpan.textContent.includes("FETCHING") || scanLabelSpan.textContent.includes("SCAN")) {
-                scanLabelSpan.textContent = "⚡ AI ENGINE";
-                predictionMainText.style.opacity = "1";
+        let lastP = null, _active = false;
+
+        function checkPass() {
+            if (document.getElementById('passInput').value.trim() === "VIP100OK") {
+                document.getElementById('loginPart').classList.add('hidden'); 
+                document.getElementById('appPart').classList.remove('hidden'); 
+                _active = true;
+                setInterval(loop, 1000);
+                setInterval(fetchData, 2000);
+            } else { 
+                alert("❌ Wrong Password!"); 
             }
         }
-        
-        // New cycle detection
-        const isNewCycleStart = (remainingSeconds === CYCLE_SECONDS || remainingSeconds === 30);
-        if (isNewCycleStart && lastPeriodHash !== rawPeriod) {
-            lastPeriodHash = rawPeriod;
-            const freshOutcome = getSavarMarketOutcome();
-            renderSavarSignal(freshOutcome);
-            const cardElement = document.querySelector(".congrats-card");
-            if (cardElement) {
-                cardElement.style.transform = "scale(0.98)";
-                setTimeout(() => { if (cardElement) cardElement.style.transform = ""; }, 100);
-            }
-        }
-        
-        if (lastPeriodHash === "") {
-            const initialSignal = getSavarMarketOutcome();
-            renderSavarSignal(initialSignal);
-            lastPeriodHash = rawPeriod;
-        }
-    }
-    
-    function forceUpdateSignal() {
-        if (!isLoggedIn) return;
-        updateSavarCycle();
-    }
-    
-    function startSavarMarketEngine() {
-        if (marketIntervalId) clearInterval(marketIntervalId);
-        updateSavarCycle();
-        marketIntervalId = setInterval(() => {
-            if (isLoggedIn && navigator.onLine) {
-                updateSavarCycle();
-            } else if (!navigator.onLine && isLoggedIn) {
-                if (marketIntervalId) {
-                    clearInterval(marketIntervalId);
-                    marketIntervalId = null;
+
+        function renderRgbPeriod(periodStr) {
+            if (!periodStr || periodStr === "....") return "....";
+            const classes = ["p-cyan", "p-pink", "p-gold", "p-green"];
+            let htmlResult = "";
+            for (let i = 0; i < periodStr.length; i++) {
+                let cls = classes[i % classes.length];
+                if (i >= periodStr.length - 4) {
+                    htmlResult += `<span class="${cls}">${periodStr[i]}</span>`;
+                } else {
+                    htmlResult += `<span>${periodStr[i]}</span>`;
                 }
             }
-        }, 1000);
-    }
-    
-    // ---------- DRAG LOGIC (COMPACT) ----------
-    let dragActiveFlag = false;
-    let dragStartPosX = 0, dragStartPosY = 0;
-    let currentTranslateX = 0, currentTranslateY = 0;
-    let baseTranslateX = 0, baseTranslateY = 0;
-    
-    function getCurrentTransform() {
-        const transform = panelElement.style.transform;
-        if (transform && transform !== 'none') {
-            const match = transform.match(/translate3d\(([-\d.]+)px,\s*([-\d.]+)px,\s*0\)/);
-            if (match) return { x: parseFloat(match[1]), y: parseFloat(match[2]) };
+            return htmlResult;
         }
-        return { x: 0, y: 0 };
-    }
-    
-    function onDragStartEvent(e) {
-        if (authLayerDiv.style.display !== 'none') return;
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
-        e.preventDefault();
-        const currentPos = getCurrentTransform();
-        baseTranslateX = currentPos.x;
-        baseTranslateY = currentPos.y;
-        const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-        const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-        dragStartPosX = clientX - baseTranslateX;
-        dragStartPosY = clientY - baseTranslateY;
-        dragActiveFlag = true;
-        panelElement.style.transition = 'none';
-    }
-    
-    function onDragMoveEvent(e) {
-        if (!dragActiveFlag) return;
-        e.preventDefault();
-        const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-        const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
-        let newX = clientX - dragStartPosX;
-        let newY = clientY - dragStartPosY;
-        const maxBoundX = window.innerWidth - panelElement.offsetWidth - 10;
-        const maxBoundY = window.innerHeight - panelElement.offsetHeight - 20;
-        newX = Math.min(maxBoundX, Math.max(5, newX));
-        newY = Math.min(maxBoundY, Math.max(40, newY));
-        panelElement.style.transform = `translate3d(${newX}px, ${newY}px, 0)`;
-        currentTranslateX = newX;
-        currentTranslateY = newY;
-    }
-    
-    function onDragEndEvent() {
-        dragActiveFlag = false;
-        panelElement.style.transition = '';
-    }
-    
-    panelElement.addEventListener('mousedown', onDragStartEvent);
-    document.addEventListener('mousemove', onDragMoveEvent);
-    document.addEventListener('mouseup', onDragEndEvent);
-    panelElement.addEventListener('touchstart', onDragStartEvent, { passive: false });
-    document.addEventListener('touchmove', onDragMoveEvent, { passive: false });
-    document.addEventListener('touchend', onDragEndEvent);
-    
-    // ---------- INITIAL POSITION ----------
-    function setInitialPanelPositioning() {
-        panelElement.style.position = 'fixed';
-        panelElement.style.top = '0px';
-        panelElement.style.left = '0px';
-        const startPosX = Math.min(window.innerWidth - 260, 16);
-        const startPosY = 70;
-        panelElement.style.transform = `translate3d(${startPosX}px, ${startPosY}px, 0)`;
-        currentTranslateX = startPosX;
-        currentTranslateY = startPosY;
-    }
-    
-    window.addEventListener('resize', () => {
-        if (panelElement.style.display === 'block') {
-            let boundedX = currentTranslateX;
-            let boundedY = currentTranslateY;
-            const maxXLimit = window.innerWidth - panelElement.offsetWidth - 10;
-            const maxYLimit = window.innerHeight - panelElement.offsetHeight - 20;
-            if (boundedX > maxXLimit) boundedX = Math.max(5, maxXLimit);
-            if (boundedY > maxYLimit) boundedY = Math.max(40, maxYLimit);
-            panelElement.style.transform = `translate3d(${boundedX}px, ${boundedY}px, 0)`;
-            currentTranslateX = boundedX;
-            currentTranslateY = boundedY;
+
+        async function fetchData() {
+            try {
+                const res = await fetch("https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json?r=" + Date.now());
+                const json = await res.json();
+                if (json.data?.list.length > 0) {
+                    lastP = (BigInt(json.data.list[0].issueNumber) + 1n).toString();
+                }
+            } catch (e) { 
+                const now = new Date();
+                const totalSeconds = Math.floor(now.getTime() / 1000);
+                lastP = Math.floor(totalSeconds / 60).toString(); 
+            }
         }
-    });
-    
-    // ---------- BOOTSTRAP ----------
-    checkConnectionWithSavar();
-    setInitialPanelPositioning();
-    
-    window.addEventListener('online', () => {
-        if (isLoggedIn && !marketIntervalId && navigator.onLine) {
-            startSavarMarketEngine();
-            forceUpdateSignal();
+
+        function analyzeQuantumSignal(period) {
+            let hash1 = 0; 
+            const seed1 = period + "DKWIN_SG_SERVER_SECURE_2026_1M_NUM_A";
+            
+            for (let i = 0; i < seed1.length; i++) {
+                hash1 = ((hash1 << 5) - hash1) + seed1.charCodeAt(i);
+                hash1 |= 0;
+            }
+            
+            let num1 = Math.abs(hash1) % 10;
+            let sizeResult = (num1 >= 5) ? "BIG" : "SMALL";
+            return { size: sizeResult };
         }
-        if (isLoggedIn) panelElement.style.display = "block";
-    });
-    
-    console.log("✅ HGZY VIP AI | Compact Panel | Savar 30s Market Active | AB Period Ready");
-</script>
+
+        function loop() {
+            if (!_active) return;
+            const now = new Date();
+            const sec = now.getSeconds();
+            
+            const pBox = document.getElementById('periodID');
+            if(lastP) {
+                pBox.innerHTML = renderRgbPeriod(lastP);
+            } else {
+                pBox.innerText = "....";
+            }
+            
+            let rem = 60 - sec;
+            if (rem === 60) rem = 0; 
+            
+            document.getElementById('timer').innerText = rem < 10 ? "0" + rem : rem;
+
+            const sigBox = document.getElementById('prediction');
+            
+            if (rem <= 5 || rem === 0) {
+                sigBox.innerHTML = '<span class="processing">GENERATING...</span>';
+            } else {
+                const result = analyzeQuantumSignal(lastP || "0");
+                sigBox.innerHTML = `<span class="res-${result.size.toLowerCase()}">${result.size}</span>`;
+            }
+        }
+
+        // Smooth dragging system
+        const box = document.getElementById("dragBox");
+        let active = false, currentX = 0, currentY = 0, initialX = 0, initialY = 0;
+
+        function dragStart(e) {
+            if(e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('svg') || e.target.classList.contains('vpn-dot') || e.target.closest('#periodID') || e.target.classList.contains('logo-ring')) return;
+            
+            const clientX = e.type === "touchstart" ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === "touchstart" ? e.touches[0].clientY : e.clientY;
+            
+            initialX = clientX - currentX;
+            initialY = clientY - currentY;
+            active = true;
+        }
+
+        function dragEnd() { active = false; }
+
+        function drag(e) {
+            if (active) {
+                e.preventDefault();
+                const clientX = e.type === "touchmove" ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type === "touchmove" ? e.touches[0].clientY : e.clientY;
+                
+                currentX = clientX - initialX;
+                currentY = clientY - initialY;
+                
+                box.style.transform = `translate(${currentX}px, ${currentY}px)`;
+            }
+        }
+
+        window.addEventListener("mousedown", dragStart);
+        window.addEventListener("mouseup", dragEnd);
+        window.addEventListener("mousemove", drag);
+        window.addEventListener("touchstart", dragStart, { passive: false });
+        window.addEventListener("touchend", dragEnd);
+        window.addEventListener("touchmove", drag, { passive: false });
+    </script>
 </body>
 </html>
